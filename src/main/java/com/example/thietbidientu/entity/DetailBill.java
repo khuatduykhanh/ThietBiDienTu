@@ -1,11 +1,10 @@
 package com.example.thietbidientu.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -18,9 +17,9 @@ public class DetailBill {
     @Column(name = "quantity",nullable = false)
     private int quantity;
     @OneToOne()
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "productId")
     private Product product2;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bill_id")
+    @JoinColumn(name = "billId")
     private Bill bill;
 }

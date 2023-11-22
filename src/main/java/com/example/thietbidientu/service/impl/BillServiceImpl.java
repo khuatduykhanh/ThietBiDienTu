@@ -2,11 +2,14 @@ package com.example.thietbidientu.service.impl;
 
 import com.example.thietbidientu.dto.*;
 import com.example.thietbidientu.entity.Bill;
+import com.example.thietbidientu.entity.DetailBill;
 import com.example.thietbidientu.entity.Product;
 import com.example.thietbidientu.entity.User;
 import com.example.thietbidientu.exception.APIException;
 import com.example.thietbidientu.exception.ResourceNotFoundException;
 import com.example.thietbidientu.repository.BillRepository;
+import com.example.thietbidientu.repository.DetailBillRepository;
+import com.example.thietbidientu.repository.ProductRepository;
 import com.example.thietbidientu.repository.UserRepository;
 import com.example.thietbidientu.service.BillService;
 //import com.example.thietbidientu.service.DetailBillService;
@@ -19,8 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -28,19 +30,49 @@ public class BillServiceImpl implements BillService {
     private BillRepository billRepository;
     @Autowired
     private UserRepository userRepository;
-//    @Autowired
-//    private DetailBillService detailBillService;
+    @Autowired
+    private DetailBillRepository detailBillRepository;
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private ModelMapper modelMapper;
     @Override
     public BillDto createBill(Long userId, BillDto billDto) {
-        Bill bill = convertBill(billDto);
+        int total = billDto.getTotal();
+        int totalDetail = 0;
+        List<DetailDto> detail = billDto.getDetail();
+        for (int i = 0; i < detail.toArray().length; i++) {
+            totalDetail = totalDetail + (detail.get(i).getPrice() * detail.get(i).getQuantity());
+        }
+        if( total != totalDetail ){
+            throw new APIException(HttpStatus.BAD_REQUEST,"Please check again");
+        }
+        Bill bill = new Bill();
+        bill.setStatus(billDto.isStatus());
+        bill.setTotal(billDto.getTotal());
         Date currentDate = new Date();
         bill.setDateTime(currentDate);
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",String.valueOf(userId)));
         bill.setUser(user);
         Bill newBill = billRepository.save(bill);
-        return convertBillDto(newBill);
+        BillDto newDto = new BillDto();
+        newDto.setId(newBill.getId());
+        newDto.setTotal(newBill.getTotal());
+        newDto.setStatus(newBill.isStatus());
+        newDto.setDateTime(newBill.getDateTime());
+        newDto.setUserId(newBill.getUser().getId());
+        List<DetailDto> newDetail = new ArrayList<>();;
+        for (DetailDto detailBill :detail) {
+            Long productId = detailBill.getProductId();
+           Product product = productRepository.find(productId);
+            DetailBill db = convertDetailBill(detailBill);
+            db.setProduct2(product);
+            db.setBill(newBill);
+            DetailBill newdb = detailBillRepository.save(db);
+            newDetail.add(convertDetailDto(newdb));
+        }
+        newDto.setDetail(newDetail);
+        return newDto;
     }
 
     @Override
@@ -55,10 +87,14 @@ public class BillServiceImpl implements BillService {
         List<Bill> listOfBill = billList.getContent(); // lấy danh sách trang đã được phân trong postList
 
         List<BillDto> content = listOfBill.stream().map(this::convertBillDto).toList();
-//        for (BillDto billDto:content ) {
-//            DetailBillResponse detailRes = detailBillService.getAllDetailByBillId(billDto.getId(),pageNo,pageSize,sortBy,sortDir);
-//            billDto.setDetail(detailRes);
-//        }
+        for (BillDto billDto:content ) {
+            List<DetailBill> detailBill =  detailBillRepository.findAllByBillId(billDto.getId());
+            List<DetailDto> detail = new ArrayList<>();
+            for (DetailBill detailbill : detailBill) {
+                detail.add(convertDetailDto(detailbill));
+            }
+            billDto.setDetail(detail);
+        }
         BillResponse billResponse = new  BillResponse();
         billResponse.setContent(content);
         billResponse.setPageNo(pageNo);
@@ -80,11 +116,15 @@ public class BillServiceImpl implements BillService {
         List<Bill> listOfBill = billList.getContent();
 
         List<BillDto> content = listOfBill.stream().map(this::convertBillDto).toList();
-//        for (BillDto billDto:content ) {
-//            DetailBillResponse detailRes = detailBillService.getAllDetailByBillId(billDto.getId(),pageNo,pageSize,sortBy,sortDir);
-//            billDto.setDetail(detailRes);
-//        }
-        System.out.println("content"+content);
+        for (BillDto billDto:content ) {
+            List<DetailBill> detailBill =  detailBillRepository.findAllByBillId(billDto.getId());
+            System.out.println("detailBill" +detailBill );
+            List<DetailDto> detail = new ArrayList<>();
+            for (DetailBill detailbill : detailBill) {
+                detail.add(convertDetailDto(detailbill));
+            }
+            billDto.setDetail(detail);
+        }
         BillResponse billResponse = new  BillResponse();
         billResponse.setContent(content);
         billResponse.setPageNo(pageNo);
@@ -100,31 +140,42 @@ public class BillServiceImpl implements BillService {
     public BillDto getBillById(Long userId, Long billId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",String.valueOf(userId)));
         Bill bill = billRepository.findById(billId).orElseThrow(()-> new ResourceNotFoundException("Bill","id",String.valueOf(billId)));
+        List<DetailBill> detailBill =  detailBillRepository.findAllByBillId(billId);
+        List<DetailDto> detail = new ArrayList<>();
+        for (DetailBill detailbill : detailBill) {
+            detail.add(convertDetailDto(detailbill));
+        }
+        BillDto billDto =  convertBillDto(bill);
+        billDto.setDetail(detail);
         if(!bill.getUser().getId().equals(user.getId())){
             throw new APIException(HttpStatus.BAD_REQUEST,"Bill does not belong to user");
         }
-        return convertBillDto(bill);
+        return billDto;
     }
 
-    @Override
-    public BillDto updateBill(Long userId, Long billId, BillDto billDto) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",String.valueOf(userId)));
-        Bill bill = billRepository.findById(billId).orElseThrow(()-> new ResourceNotFoundException("Bill","id",String.valueOf(billId)));
-        if(!bill.getUser().getId().equals(user.getId())){
-            throw new APIException(HttpStatus.BAD_REQUEST,"Bill does not belong to user");
-        }
-        bill.setTotal(billDto.getTotal());
-        Date currentDate = new Date();
-        bill.setDateTime(currentDate);
-        bill.setStatus(billDto.isStatus());
-        Bill newBill = billRepository.save(bill);
-        return convertBillDto(newBill);
-    }
+//    @Override
+//    public BillDto updateBill(Long userId, Long billId, BillDto billDto) {
+//        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",String.valueOf(userId)));
+//        Bill bill = billRepository.findById(billId).orElseThrow(()-> new ResourceNotFoundException("Bill","id",String.valueOf(billId)));
+//        if(!bill.getUser().getId().equals(user.getId())){
+//            throw new APIException(HttpStatus.BAD_REQUEST,"Bill does not belong to user");
+//        }
+//        bill.setTotal(billDto.getTotal());
+//        Date currentDate = new Date();
+//        bill.setDateTime(currentDate);
+//        bill.setStatus(billDto.isStatus());
+//        Bill newBill = billRepository.save(bill);
+//        return convertBillDto(newBill);
+//    }
 
     @Override
     public void deleteBill(Long userId, Long billId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",String.valueOf(userId)));
         Bill bill = billRepository.findById(billId).orElseThrow(()-> new ResourceNotFoundException("Bill","id",String.valueOf(billId)));
+        List<DetailBill> detailBill =  detailBillRepository.findAllByBillId(billId);
+        for (DetailBill detailbill : detailBill) {
+            detailBillRepository.delete(detailbill);
+        }
         if(!bill.getUser().getId().equals(user.getId())){
             throw new APIException(HttpStatus.BAD_REQUEST,"Bill does not belong to user");
         }
@@ -136,5 +187,11 @@ public class BillServiceImpl implements BillService {
     }
     private BillDto convertBillDto(Bill bill){
         return modelMapper.map(bill,BillDto.class);
+    }
+    private DetailBill convertDetailBill(DetailDto detailDto){
+        return modelMapper.map(detailDto,DetailBill.class);
+    }
+    private DetailDto convertDetailDto(DetailBill detailBill){
+        return modelMapper.map(detailBill,DetailDto.class);
     }
 }

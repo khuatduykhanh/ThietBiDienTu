@@ -8,6 +8,6 @@ public interface BillService {
     BillResponse getAllBill(int pageNo, int pageSize, String sortBy, String sortDir);
     BillResponse getAllBillByUserId(Long userId,int pageNo, int pageSize, String sortBy, String sortDir);
     BillDto getBillById(Long userId, Long billId);
-    BillDto updateBill(Long userId, Long billId, BillDto billDto);
+//    BillDto updateBill(Long userId, Long billId, BillDto billDto);
     void deleteBill(Long userId, Long billId);
 }

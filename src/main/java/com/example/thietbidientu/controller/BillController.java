@@ -41,10 +41,10 @@ public class BillController {
         return ResponseEntity.ok(billService.getBillById(userId, billId));
     }
 
-    @PutMapping("/user/{userId}/bill/{billId}")
-    public ResponseEntity<BillDto> updateBill(@PathVariable("userId") Long userId,@PathVariable("billId") Long billId,@Valid @RequestBody BillDto billDto){
-        return ResponseEntity.ok(billService.updateBill(userId, billId, billDto));
-    }
+//    @PutMapping("/user/{userId}/bill/{billId}")
+//    public ResponseEntity<BillDto> updateBill(@PathVariable("userId") Long userId,@PathVariable("billId") Long billId,@Valid @RequestBody BillDto billDto){
+//        return ResponseEntity.ok(billService.updateBill(userId, billId, billDto));
+//    }
 
     @DeleteMapping("/user/{userId}/bill/{billId}")
     public ResponseEntity<String> deleteComment(@PathVariable("userId") Long userId,@PathVariable("billId") Long billId){

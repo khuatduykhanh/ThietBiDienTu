@@ -1,15 +1,14 @@
 package com.example.thietbidientu.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +28,5 @@ public class Bill {
     private User user;
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL)
     private Set<DetailBill> bills = new HashSet<>();
+
 }
