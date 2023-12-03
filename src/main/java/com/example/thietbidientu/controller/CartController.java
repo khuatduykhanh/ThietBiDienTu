@@ -25,4 +25,14 @@ public class CartController {
     public CartResponse getCartDetail(@PathVariable("userId") Long userId){
         return cartService.getCart(userId);
     }
+
+    @PutMapping("/{userId}")
+    public CartResponse updateCartDetail(@PathVariable("userId") Long userId,@Valid @RequestBody DetailCartDto detailDto){
+        return cartService.updateCartDetail(userId,detailDto);
+    }
+
+    @DeleteMapping("/{userId}/{productId}")
+    public String deleteCartDetail(@PathVariable("userId") Long userId,@PathVariable("productId") Long productId){
+        return cartService.deleteCartDetail(userId,productId);
+    }
 }

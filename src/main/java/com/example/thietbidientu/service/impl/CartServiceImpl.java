@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+
 @Service
 public class CartServiceImpl implements CartService {
     @Autowired
@@ -34,7 +36,7 @@ public class CartServiceImpl implements CartService {
     private ModelMapper modelMapper;
     @Override
     public CartResponse createCartDetail(Long userId, DetailCartDto detailDto) {
-        Cart check = cartRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        Cart check = cartRepository.findByUserId(userId);
         if(check != null){
             DetailCart detailCart = convertDetailCart(detailDto);
             List<DetailCart> listDetail = detailCartRepository.findAllByCartId(check.getId());
@@ -80,7 +82,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        Cart cart = cartRepository.findByUserId1(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
         List<DetailCart> listDetail = detailCartRepository.findAllByCartId(cart.getId());
         List<DetailCartDto> detailCartDto = new ArrayList<DetailCartDto>();
         for (DetailCart detail : listDetail) {
@@ -94,13 +96,48 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponse updateCartDetail(Long userId, Long detailId, DetailDto detailDto) {
-        return null;
+    public CartResponse updateCartDetail(Long userId, DetailCartDto detailDto) {
+        Cart cart = cartRepository.findByUserId1(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        List<DetailCart> listDetail = detailCartRepository.findAllByCartId(cart.getId());
+        for (DetailCart detail : listDetail) {
+            if(Objects.equals(detail.getProduct3().getId(), detailDto.getProductId())){
+                if(detail.getQuantity() > detailDto.getQuantity()) {
+                    cart.setTotal(cart.getTotal() - (detail.getQuantity()-detailDto.getQuantity()) * detail.getPrice());
+                }else{
+                    cart.setTotal(cart.getTotal() + (detailDto.getQuantity() - detail.getQuantity()) * detail.getPrice());
+                }
+                detail.setQuantity(detailDto.getQuantity());
+                detailCartRepository.save(detail);
+                cartRepository.save(cart);
+            }
+        }
+        Cart cart1 = cartRepository.findByUserId1(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        List<DetailCart> listDetail1 = detailCartRepository.findAllByCartId(cart.getId());
+        List<DetailCartDto> detailCartDto = new ArrayList<DetailCartDto>();
+        for (DetailCart detail : listDetail1) {
+            detailCartDto.add(convertDetailDto(detail));
+        }
+        CartResponse cartRes = new CartResponse();
+        cartRes.setUserId(userId);
+        cartRes.setTotal(cart1.getTotal());
+        cartRes.setDetailCart(detailCartDto);
+        return cartRes;
     }
 
     @Override
-    public void deleteCartDetail(Long userId, Long detailId) {
-
+    public String deleteCartDetail(Long userId, Long productId) {
+        Cart cart = cartRepository.findByUserId1(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        List<DetailCart> listDetail = detailCartRepository.findAllByCartId(cart.getId());
+        for (DetailCart detail : listDetail) {
+            System.out.println("Id"+detail.getProduct3().getId());
+            if(Objects.equals(detail.getProduct3().getId(), productId)){
+                cart.setTotal(cart.getTotal() - detail.getPrice() * detail.getQuantity());
+                cartRepository.save(cart);
+                detailCartRepository.delete(detail);
+                return "Delete Successfully";
+            }
+        }
+        return "Id product not exit in cart";
     }
 
     private DetailCart convertDetailCart(DetailCartDto detailDto){
