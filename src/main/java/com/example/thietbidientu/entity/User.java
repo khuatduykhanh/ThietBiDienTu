@@ -35,4 +35,7 @@ public class User {
     private Set<Role> roles;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Bill> bills = new HashSet<>();
+    @OneToOne(mappedBy = "user1", cascade = CascadeType.ALL)
+    private Cart cart;
+
 }

@@ -22,7 +22,7 @@ public class ImageData {
     private String type;
     @Column(name = "imageData",length = 1000)
     private byte[] imageData;
-    @OneToOne()
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 }

@@ -1,14 +1,15 @@
 package com.example.thietbidientu.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-public class DetailBill {
+public class DetailCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,8 +19,8 @@ public class DetailBill {
     private int quantity;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId")
-    private Product product2;
+    private Product product3;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "billId")
-    private Bill bill;
+    @JoinColumn(name = "cartId")
+    private Cart cart;
 }

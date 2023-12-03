@@ -3,12 +3,16 @@ package com.example.thietbidientu.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "product")
+@Table(name = "product",uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +35,8 @@ public class Product {
     private boolean status;
     @OneToOne(mappedBy = "product",cascade = CascadeType.ALL)
     private ImageData image;
-    @OneToOne(mappedBy = "product2",cascade = CascadeType.ALL)
-    private DetailBill detailBill;
+    @OneToMany(mappedBy = "product2",cascade = CascadeType.ALL)
+    private Set<DetailBill> detailBill = new HashSet<>();
+    @OneToMany(mappedBy = "product3",cascade = CascadeType.ALL)
+    private Set<DetailCart> detailCart = new HashSet<>() ;
 }

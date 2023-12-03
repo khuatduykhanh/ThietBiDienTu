@@ -64,7 +64,7 @@ public class BillServiceImpl implements BillService {
         List<DetailDto> newDetail = new ArrayList<>();;
         for (DetailDto detailBill :detail) {
             Long productId = detailBill.getProductId();
-           Product product = productRepository.find(productId);
+           Product product = productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("product","id",String.valueOf(productId)));
             DetailBill db = convertDetailBill(detailBill);
             db.setProduct2(product);
             db.setBill(newBill);
