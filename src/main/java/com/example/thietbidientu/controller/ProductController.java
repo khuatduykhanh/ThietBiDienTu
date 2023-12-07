@@ -54,6 +54,15 @@ public class ProductController {
     ){
         return productService.getAllProductByBrand(pageNo,pageSize,sortBy,sortDir,brand);
     }
+    @GetMapping("/search")
+    public ProductResponse searchProduct(@RequestParam(name = "pageNo",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER,required = false) int pageNo,
+                                                @RequestParam(name = "pageSize",defaultValue = AppConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
+                                                @RequestParam(name = "sortBy",defaultValue = AppConstants.DEFAULT_SORT_BY,required = false) String sortBy,
+                                                @RequestParam(name = "sortDir",defaultValue = AppConstants.DEFAULT_SORT_DIR,required = false) String sortDir, // sortDir sắp xếp tăng hay giảm
+                                                @RequestParam(name = "search") String name
+    ){
+        return productService.searchProduct(pageNo,pageSize,sortBy,sortDir,name);
+    }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping()
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) throws IOException {

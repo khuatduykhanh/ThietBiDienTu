@@ -47,6 +47,7 @@ public class BillServiceImpl implements BillService {
         if( total != totalDetail ){
             throw new APIException(HttpStatus.BAD_REQUEST,"Please check again");
         }
+
         Bill bill = new Bill();
         bill.setStatus(billDto.isStatus());
         bill.setTotal(billDto.getTotal());
@@ -65,11 +66,15 @@ public class BillServiceImpl implements BillService {
         for (DetailDto detailBill :detail) {
             Long productId = detailBill.getProductId();
            Product product = productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("product","id",String.valueOf(productId)));
-            DetailBill db = convertDetailBill(detailBill);
-            db.setProduct2(product);
-            db.setBill(newBill);
-            DetailBill newdb = detailBillRepository.save(db);
-            newDetail.add(convertDetailDto(newdb));
+           if(product.getQuantity() >= detailBill.getQuantity()) {
+               DetailBill db = convertDetailBill(detailBill);
+               db.setProduct2(product);
+               db.setBill(newBill);
+               DetailBill newdb = detailBillRepository.save(db);
+               newDetail.add(convertDetailDto(newdb));
+           }else{
+               throw new APIException(HttpStatus.BAD_REQUEST,"Quantity not ");
+           }
         }
         newDto.setDetail(newDetail);
         return newDto;

@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -20,4 +23,6 @@ public class Supplier {
     private String address;
     @Column(name = "contact",nullable = false)
     private String contact;
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL)
+    private Set<Invoice> invoices = new HashSet<>();
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class SupplierController {
     @Autowired
     private SupplierService supplierService;
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping()
     public SupplierResponse getAllSupplier(@RequestParam(name = "pageNo",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER,required = false) int pageNo,
                                            @RequestParam(name = "pageSize",defaultValue = AppConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
@@ -27,29 +27,30 @@ public class SupplierController {
     ){
         return supplierService.getAllSupplier(pageNo,pageSize,sortBy,sortDir);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping()
     public ResponseEntity<SupplierDto> createSupplier(@Valid @RequestBody SupplierDto supplierDto){
         return new ResponseEntity<>(supplierService.createSupplier(supplierDto), HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<SupplierDto> getSupplierById(@PathVariable("id") Long id){
         return ResponseEntity.ok(supplierService.getSupplierById(id));
     }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/name/{name}")
     public ResponseEntity<SupplierDto> getSupplierByName(@PathVariable("name") String name){
         return ResponseEntity.ok(supplierService.getSupplierByName(name));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SupplierDto> updateSupplier(@PathVariable("id") Long id,@Valid @RequestBody SupplierDto supplierDto){
         SupplierDto newSupplier = supplierService.updateSupplier(supplierDto,id);
         return ResponseEntity.ok(newSupplier);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSupplier(@PathVariable("id") Long id){
         supplierService.deleteSupplier(id);

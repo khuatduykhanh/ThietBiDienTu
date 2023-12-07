@@ -39,4 +39,6 @@ public class Product {
     private Set<DetailBill> detailBill = new HashSet<>();
     @OneToMany(mappedBy = "product3",cascade = CascadeType.ALL)
     private Set<DetailCart> detailCart = new HashSet<>() ;
+    @OneToMany(mappedBy = "product4",cascade = CascadeType.ALL)
+    private Set<DetailInvoice> detailInvoice = new HashSet<>() ;
 }
