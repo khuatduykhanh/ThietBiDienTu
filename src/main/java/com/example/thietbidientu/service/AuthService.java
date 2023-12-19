@@ -8,5 +8,5 @@ public interface AuthService {
     String signup(SigninDto signinDto);
     JWTAuthResponse refreshToken(RefreshTokenReq refreshTokenRequest);
     UserResponse getUserByEmail(String email);
-
+    int getIdByEmail(String email);
 }

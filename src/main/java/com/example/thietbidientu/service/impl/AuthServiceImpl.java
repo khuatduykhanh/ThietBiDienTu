@@ -73,7 +73,6 @@ public class AuthServiceImpl implements AuthService {
         Role role = roleRepository.findByName("ROLE_USER").get();
         user.setRoles(Collections.singleton(role));
         userRepository.save(user);
-
         return "User rigistered successfully";
     }
 
@@ -92,9 +91,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserResponse getUserByEmail(String email) {
-        User user =  userRepository.findIdByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User","email",email));
+        User user =  userRepository.findUserByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User","email",email));
         return convertUserResponse(user);
     }
+
+    @Override
+    public int getIdByEmail(String email) {
+        return userRepository.findIdByEmail(email);
+    }
+
     private UserResponse convertUserResponse(User user){
         return modelMapper.map(user,UserResponse.class);
     }

@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/auth/signup")
     public ResponseEntity<?> registerUser(@RequestBody SigninDto signinDto){
-        return new ResponseEntity<>(authService.signup(signinDto),HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.singletonMap("message",authService.signup(signinDto)),HttpStatus.OK);
     }
 
     @PostMapping("/auth/refreshToken")
@@ -50,6 +50,12 @@ public class AuthController {
     @GetMapping("userId")
     public ResponseEntity<UserResponse> getUserIdByEmail(@RequestParam(name = "email") String email){
         return ResponseEntity.ok(authService.getUserByEmail(email));
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("getUserId")
+    public int getIdByEmail(@RequestParam(name = "email") String email){
+        return authService.getIdByEmail(email);
     }
 
 }
