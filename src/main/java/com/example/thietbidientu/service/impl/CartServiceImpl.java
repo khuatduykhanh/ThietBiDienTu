@@ -58,7 +58,6 @@ public class CartServiceImpl implements CartService {
             }
             check.setTotal(check.getTotal() + (detailDto.getPrice() * detailDto.getQuantity()));
             Cart newcart = cartRepository.save(check);
-
             List<DetailCartDto> newList = new ArrayList<>();
             for (DetailCart detail : listDetail) {
                 newList.add(convertDetailDto(detail));
@@ -98,7 +97,10 @@ public class CartServiceImpl implements CartService {
         List<DetailCart> listDetail = detailCartRepository.findAllByCartId(cart.getId());
         List<DetailCartDto> detailCartDto = new ArrayList<DetailCartDto>();
         for (DetailCart detail : listDetail) {
-            detailCartDto.add(convertDetailDto(detail));
+            Product product =  productRepository.findById(detail.getProduct3().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+            DetailCartDto db =  convertDetailDto(detail);
+            db.setName(product.getName());
+            detailCartDto.add(db);
         }
         CartResponse cartRes = new CartResponse();
         cartRes.setUserId(userId);

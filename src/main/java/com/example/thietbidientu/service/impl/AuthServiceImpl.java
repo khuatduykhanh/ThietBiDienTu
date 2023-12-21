@@ -100,6 +100,16 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.findIdByEmail(email);
     }
 
+    @Override
+    public String updateUser(String email,UserUpdate userUpdate) {
+        User user =  userRepository.findUserByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User","email",email));
+        user.setFullname(userUpdate.getFullname());
+        user.setAddress(userUpdate.getAddress());
+        user.setYourphone(userUpdate.getYourphone());
+        userRepository.save(user);
+        return "Update successfuly";
+    }
+
     private UserResponse convertUserResponse(User user){
         return modelMapper.map(user,UserResponse.class);
     }

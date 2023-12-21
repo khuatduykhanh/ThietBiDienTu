@@ -36,10 +36,7 @@ public class AuthController {
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         return new ResponseEntity<>(authService.signin(loginDto),HttpStatus.OK);
     }
-    @PostMapping("/admin/signin")
-    public ResponseEntity<JWTAuthResponse> authenticateAdmin(@RequestBody LoginDto loginDto){
-        return new ResponseEntity<>(authService.signin(loginDto),HttpStatus.OK);
-    }
+
     @PostMapping("/auth/signup")
     public ResponseEntity<?> registerUser(@RequestBody SigninDto signinDto){
         return new ResponseEntity<>(Collections.singletonMap("message",authService.signup(signinDto)),HttpStatus.OK);
@@ -59,6 +56,12 @@ public class AuthController {
     @GetMapping("getUserId")
     public int getIdByEmail(@RequestParam(name = "email") String email){
         return authService.getIdByEmail(email);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping("updateUser")
+    public String updateUser(@RequestParam(name = "email") String email,@RequestBody UserUpdate userUpdate){
+        return authService.updateUser(email,userUpdate);
     }
 
 }

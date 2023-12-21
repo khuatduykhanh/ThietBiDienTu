@@ -128,6 +128,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductResponse getTop5() {
+        return null;
+    }
+
+    @Override
     public ProductResponse searchProduct(int pageNo, int pageSize, String sortBy, String sortDir, String name) {
         // câu lệnh này sẽ xem xét sortDir là asc hay des
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();

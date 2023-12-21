@@ -13,6 +13,7 @@ public interface ProductService {
     ProductResponse getAllProductByCategory(int pageNo, int pageSize, String sortBy, String sortDir, String category);
     ProductResponse getAllProductByBrand(int pageNo, int pageSize, String sortBy, String sortDir, String brand);
     ProductDto getProductById(Long id);
+    ProductResponse getTop5();
     ProductResponse searchProduct(int pageNo, int pageSize, String sortBy, String sortDir, String name);
     ProductDto updateProduct(ProductDto postDto,Long id);
     void  deleteProduct(Long id);

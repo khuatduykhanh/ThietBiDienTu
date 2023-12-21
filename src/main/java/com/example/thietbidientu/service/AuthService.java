@@ -9,4 +9,5 @@ public interface AuthService {
     JWTAuthResponse refreshToken(RefreshTokenReq refreshTokenRequest);
     UserResponse getUserByEmail(String email);
     int getIdByEmail(String email);
+    String updateUser(String email,UserUpdate userUpdate);
 }
