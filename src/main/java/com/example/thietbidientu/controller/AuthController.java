@@ -60,8 +60,8 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("updateUser")
-    public String updateUser(@RequestParam(name = "email") String email,@RequestBody UserUpdate userUpdate){
-        return authService.updateUser(email,userUpdate);
+    public ResponseEntity<?> updateUser(@RequestParam(name = "email") String email,@RequestBody UserUpdate userUpdate){
+        return new ResponseEntity<>(Collections.singletonMap("message",authService.updateUser(email,userUpdate)),HttpStatus.OK);
     }
 
 }
