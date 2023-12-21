@@ -13,6 +13,7 @@ import com.example.thietbidientu.repository.ProductRepository;
 import com.example.thietbidientu.repository.UserRepository;
 import com.example.thietbidientu.service.BillService;
 //import com.example.thietbidientu.service.DetailBillService;
+import com.example.thietbidientu.service.CartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,8 @@ public class BillServiceImpl implements BillService {
     private DetailBillRepository detailBillRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CartService cartService;
     @Autowired
     private ModelMapper modelMapper;
     @Override
@@ -77,6 +80,7 @@ public class BillServiceImpl implements BillService {
            }
         }
         newDto.setDetail(newDetail);
+        cartService.deleteAllCart(userId);
         return newDto;
     }
 

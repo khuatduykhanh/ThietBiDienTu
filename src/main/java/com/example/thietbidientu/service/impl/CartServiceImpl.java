@@ -40,13 +40,25 @@ public class CartServiceImpl implements CartService {
         if(check != null){
             DetailCart detailCart = convertDetailCart(detailDto);
             List<DetailCart> listDetail = detailCartRepository.findAllByCartId(check.getId());
-            Product product =  productRepository.findById(detailDto.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product","id",String.valueOf(detailDto.getProductId())));;
-            detailCart.setProduct3(product);
-            detailCart.setCart(check);
-            DetailCart newDetail =  detailCartRepository.save(detailCart);
+            Product product =  productRepository.findById(detailDto.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product","id",String.valueOf(detailDto.getProductId())));
+            boolean test = false;
+            DetailCart newDetail = new DetailCart();
+            for (DetailCart detail : listDetail) {
+                if(Objects.equals(product.getId(), detail.getProduct3().getId())){
+                    detail.setQuantity(detail.getQuantity() + detailDto.getQuantity());
+                    detailCartRepository.save(detail);
+                    test = true;
+                }
+            }
+            if(!test) {
+                detailCart.setProduct3(product);
+                detailCart.setCart(check);
+                newDetail = detailCartRepository.save(detailCart);
+                listDetail.add(newDetail);
+            }
             check.setTotal(check.getTotal() + (detailDto.getPrice() * detailDto.getQuantity()));
             Cart newcart = cartRepository.save(check);
-            listDetail.add(newDetail);
+
             List<DetailCartDto> newList = new ArrayList<>();
             for (DetailCart detail : listDetail) {
                 newList.add(convertDetailDto(detail));
@@ -136,6 +148,17 @@ public class CartServiceImpl implements CartService {
                 detailCartRepository.delete(detail);
                 return "Delete Successfully";
             }
+        }
+        return "Id product not exit in cart";
+    }
+
+    public String deleteAllCart(Long userId) {
+        Cart cart = cartRepository.findByUserId1(userId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",String.valueOf(userId)));
+        List<DetailCart> listDetail = detailCartRepository.findAllByCartId(cart.getId());
+        for (DetailCart detail : listDetail) {
+            cart.setTotal(cart.getTotal() - detail.getPrice() * detail.getQuantity());
+            cartRepository.save(cart);
+            detailCartRepository.delete(detail);
         }
         return "Id product not exit in cart";
     }

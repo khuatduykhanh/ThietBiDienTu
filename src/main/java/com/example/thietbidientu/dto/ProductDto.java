@@ -22,6 +22,7 @@ public class ProductDto {
     private String brand;
     @NotEmpty(message = "description cannot be blank")
     private String description;
+    private String urlImage;
     @Min(1)
     private int price;
     @Min(1)

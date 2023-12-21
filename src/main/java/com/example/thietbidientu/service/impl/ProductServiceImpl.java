@@ -29,8 +29,6 @@ public class ProductServiceImpl implements ProductService {
         Product newPr = productRepository.save(pr);
         return convertProductDto(newPr);
     }
-
-    @Override
     public ProductResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
         // câu lệnh này sẽ xem xét sortDir là asc hay des
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -42,6 +40,33 @@ public class ProductServiceImpl implements ProductService {
         List<Product> listOfProduct = productList.getContent(); // lấy danh sách trang đã được phân trong postList
 
         List<ProductDto> content = listOfProduct.stream().map(this::convertProductDto).toList();
+        for (ProductDto product : content) {
+            product.setUrlImage("http://localhost:8080/api/product/getImage/"+product.getId());
+        }
+        ProductResponse productResponse = new  ProductResponse();
+        productResponse.setContent(content);
+        productResponse.setPageNo(pageNo);
+        productResponse.setPageSize(pageSize);
+        productResponse.setTotalElement(productList.getTotalElements());
+        productResponse.setTotalPage(productList.getTotalPages());
+        productResponse.setLast(productList.isLast());
+        return productResponse;
+    }
+    @Override
+    public ProductResponse getAllProduct2(int pageNo, int pageSize, String sortBy, String sortDir) {
+        // câu lệnh này sẽ xem xét sortDir là asc hay des
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);  // set up số trang, số lượng trong một trang và sắp xếp theo miền nào
+
+        Page<Product> productList =  productRepository.findAll(pageable); // findAll với số trang và số lượng trang sẽ trong về Page
+
+        List<Product> listOfProduct = productList.getContent(); // lấy danh sách trang đã được phân trong postList
+
+        List<ProductDto> content = listOfProduct.stream().map(this::convertProductDto).toList();
+        for (ProductDto product : content) {
+            product.setUrlImage("http://localhost:8080/api/product/getImage/"+product.getId());
+        }
         ProductResponse productResponse = new  ProductResponse();
         productResponse.setContent(content);
         productResponse.setPageNo(pageNo);

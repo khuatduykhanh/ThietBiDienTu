@@ -34,7 +34,14 @@ public class ProductController {
     ){
         return productService.getAllProduct(pageNo,pageSize,sortBy,sortDir);
     }
-
+    @GetMapping("/v2")
+    public ProductResponse getAllProduct2(@RequestParam(name = "pageNo",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER,required = false) int pageNo,
+                                         @RequestParam(name = "pageSize",defaultValue = AppConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
+                                         @RequestParam(name = "sortBy",defaultValue = AppConstants.DEFAULT_SORT_BY,required = false) String sortBy,
+                                         @RequestParam(name = "sortDir",defaultValue = AppConstants.DEFAULT_SORT_DIR,required = false) String sortDir // sortDir sắp xếp tăng hay giảm
+    ){
+        return productService.getAllProduct2(pageNo,pageSize,sortBy,sortDir);
+    }
     @GetMapping("/category")
     public ProductResponse getAllProductByCategory(@RequestParam(name = "pageNo",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER,required = false) int pageNo,
                                       @RequestParam(name = "pageSize",defaultValue = AppConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,

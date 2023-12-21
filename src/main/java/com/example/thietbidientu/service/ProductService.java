@@ -9,9 +9,8 @@ import java.util.List;
 public interface ProductService {
     ProductDto createProduct(ProductDto productDto);
     ProductResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir);
-
+    ProductResponse getAllProduct2(int pageNo, int pageSize, String sortBy, String sortDir);
     ProductResponse getAllProductByCategory(int pageNo, int pageSize, String sortBy, String sortDir, String category);
-
     ProductResponse getAllProductByBrand(int pageNo, int pageSize, String sortBy, String sortDir, String brand);
     ProductDto getProductById(Long id);
     ProductResponse searchProduct(int pageNo, int pageSize, String sortBy, String sortDir, String name);
